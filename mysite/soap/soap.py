@@ -1,3 +1,4 @@
+from os import name
 from lxml.builder import ElementMaker
 from spyne import Application, rpc, ServiceBase, Iterable
 from spyne import Iterable, Array, Unicode
@@ -14,11 +15,8 @@ from spyne.server.wsgi import WsgiApplication
 from django.db import IntegrityError
 from spyne import Mandatory as M
 
-from mysite.models.Ubicacion import Ubicacion
-from mysite.models.Elemento import Elemento
-
 class Ubicaciones(ComplexModel):
-    centro = String
+    centro = Double
     nivel1 = String
     nivel2 = String
     nivel3 = String
@@ -26,16 +24,53 @@ class Ubicaciones(ComplexModel):
     nivel5 = String
     nivel6 = String
     
+class Resultados(ComplexModel):
+    type = String
+    code = Double
+    message = String
+    
+class Datos(ComplexModel):
+    descripcion = Unicode
+    codigo = Unicode
+    
 class Elementos(ComplexModel):
-    elementos = M(Array(M(Unicode), member_name='elemento'))
+    elementos = M(Array(M(Datos), member_name='elemento'))
+    ex_result = Resultados
 
 class UbicacionesService(ServiceBase):
     @rpc(Ubicaciones, _returns=Elementos)
     def getElements(ctx, codUbicacion: Ubicaciones):
-        if codUbicacion.centro == "" and codUbicacion.nivel1 == "":
-            elements = Elementos()
-            elements.elementos = ['edificio1', 'edificio2', 'edificio3']
+        elements = Elementos()
+        elements.ex_result = Resultados()
+        elements.ex_result.type = "S"
+        elements.ex_result.code = 000
+        elements.ex_result.message = "Proceso realizado con éxito"
+        
+        if codUbicacion.centro == "":
+            elements.elementos = ['centro1', 'centro2', 'centro3']
             return elements
+        elif codUbicacion.nivel1 == "":
+            elements.elementos = ['hospital1', 'hospital2', 'hospital3']
+            return elements
+        elif codUbicacion.nivel2 == "":
+            for i in range(1, 4):
+                elements.elementos = [["Edificio"+str(i), "E0"+str(i)]]
+            return elements
+        elif codUbicacion.nivel3 == "":
+            elements.elementos = ['planta1', 'planta2', 'planta3']
+            return elements
+        elif codUbicacion.nivel4 == "":
+            elements.elementos = ['unidad1, ala1', 'unidad2, ala2', 'unidad3, ala3']
+            return elements
+        elif codUbicacion.nivel5 == "":
+            elements.elementos = ['sala1, zona1', 'sala2, zona2', 'sala3, zona3']
+            return elements
+        elif codUbicacion.nivel6 == "":
+            elements.elementos = ['sala1, habitacion1', 'sala2, habitacion2', 'sala3, habitacion3']
+            return elements
+        else:
+            return codUbicacion
+            
 
 application = Application(
     [UbicacionesService], 

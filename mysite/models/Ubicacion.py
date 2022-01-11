@@ -1,8 +1,13 @@
 from django.db import models
 
 class Ubicacion(models.Model):
-    centro = models.TextField(max_length=15, unique=True, blank=True, null=True)
+    centro = models.DecimalField(max_length=9, unique=True, blank=True, null=True)
     nivel1 = models.TextField(max_length=15, unique=True, blank=True, null=True)
+    nivel2 = models.TextField(max_length=15, unique=True, blank=True, null=True)
+    nivel3 = models.TextField(max_length=15, unique=True, blank=True, null=True)
+    nivel4 = models.TextField(max_length=15, unique=True, blank=True, null=True)
+    nivel5 = models.TextField(max_length=15, unique=True, blank=True, null=True)
+    nivel6 = models.TextField(max_length=15, unique=True, blank=True, null=True)
     
     class Meta:
         verbose_name = 'Ubicacion'
